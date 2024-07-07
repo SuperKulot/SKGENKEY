@@ -79,7 +79,7 @@ def generate_keystore():
         # Upload the keystore file via FTP
         uploaded_path = upload_to_ftp(keystore_name)
         if uploaded_path:
-            url = f"https://ftp.pinoycrackers.net{uploaded_path}"  # Example URL format
+            url = f"https://pinoycrackers.net{uploaded_path}"  # Example URL format
             print(f"File {keystore_name} uploaded successfully via FTP.")
             print(f"You can access it at: {url}")
 
