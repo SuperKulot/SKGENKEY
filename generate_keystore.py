@@ -2,6 +2,7 @@ import subprocess
 import requests
 import getpass
 import time
+import os
 from tqdm import tqdm
 
 def display_banner():
@@ -47,6 +48,13 @@ def generate_keystore():
     validity_years = int(input("Enter validity years (e.g., 100): "))
     key_size = 8192  # Fixed key size as per your requirement
 
+    # Create directory if it doesn't exist
+    output_dir = "GenKeyBySK"
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    
+    keystore_path = os.path.join(output_dir, keystore_name)
+
     try:
         # Define the distinguished name fields
         dname = f"CN={common_name}, O={organization}, OU={organizational_unit}, C={country_code}"
@@ -65,14 +73,14 @@ def generate_keystore():
             '-keyalg', 'RSA',
             '-keysize', str(key_size),
             '-validity', str(validity_years * 365),  # Convert years to days
-            '-keystore', keystore_name,
+            '-keystore', keystore_path,
             '-storepass', keystore_password,
             '-keypass', alias_password,
             '-dname', dname
         ]
 
         subprocess.run(command, check=True)
-        print(f"Keystore {keystore_name} created successfully.")
+        print(f"Keystore {keystore_path} created successfully.")
     
     except subprocess.CalledProcessError as e:
         print(f"An error occurred: {e}")
