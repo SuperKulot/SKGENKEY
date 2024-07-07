@@ -38,7 +38,7 @@ def login(users):
     return False
 
 def generate_keystore():
-    keystore_name = input("Enter keystore name (e.g., mykeystore.jks): ")
+    keystore_name = input("Enter keystore name (e.g., SuperKulot.jks): ")
     keystore_password = getpass.getpass("Enter keystore password: ")
     alias_name = input("Enter alias name: ")
     alias_password = getpass.getpass("Enter alias password: ")
@@ -77,7 +77,11 @@ def generate_keystore():
         print(f"Keystore {keystore_name} created successfully.")
 
         # Upload the keystore file via FTP
-        upload_to_ftp(keystore_name)
+        uploaded_path = upload_to_ftp(keystore_name)
+        if uploaded_path:
+            url = f"https://ftp.pinoycrackers.net{uploaded_path}"  # Example URL format
+            print(f"File {keystore_name} uploaded successfully via FTP.")
+            print(f"You can access it at: {url}")
 
     except subprocess.CalledProcessError as e:
         print(f"An error occurred: {e}")
@@ -98,10 +102,12 @@ def upload_to_ftp(filename):
             with open(filename, 'rb') as file:
                 ftp.storbinary(f'STOR {filename}', file)
 
-            print(f"File {filename} uploaded successfully to https://pinoycrackers.net/Keys/{keystore_name}")
+            # Return the path where the file was uploaded
+            return f"{ftp_directory}/{filename}"
     
     except Exception as e:
         print(f"Failed to upload file via FTP: {e}")
+        return None
 
 # Display banner
 display_banner()
