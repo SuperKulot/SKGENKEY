@@ -1,2 +1,2 @@
-echo "requests" > requirements.txt
-echo "tqdm" >> requirements.txt
+requests
+tqdm
